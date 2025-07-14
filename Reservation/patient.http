@@ -1,0 +1,27 @@
+POST http://localhost:5245/patient/
+Content-Type: application/json
+
+{
+    "patientId": 1,
+    "doctorId": 1,
+    "reservationDate": "2025-12-30T20:00:00"
+}
+
+###
+GET http://localhost:5245/patient/3
+
+###
+GET http://localhost:5245/patient/reservation/8
+
+###
+PUT http://localhost:5245/patient/reservation/5
+Content-Type: application/json
+
+{
+    "patientId": 3,
+    "doctorId": 3,
+    "reservationDate" : "2025-11-30T19:30:00"
+}
+
+###
+DELETE http://localhost:5245/patient/3/9
