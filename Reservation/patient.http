@@ -2,8 +2,8 @@ POST http://localhost:5245/patient/
 Content-Type: application/json
 
 {
-    "patientId": 1,
-    "doctorId": 1,
+    "patientId": 3,
+    "doctorId": 2,
     "reservationDate": "2025-12-30T20:00:00"
 }
 
@@ -11,16 +11,15 @@ Content-Type: application/json
 GET http://localhost:5245/patient/3
 
 ###
-GET http://localhost:5245/patient/reservation/8
+GET http://localhost:5245/patient/reservation/5
 
 ###
 PUT http://localhost:5245/patient/reservation/5
 Content-Type: application/json
 
 {
-    "patientId": 3,
     "doctorId": 3,
-    "reservationDate" : "2025-11-30T19:30:00"
+    "reservationDate" : "2025-10-30T19:30:00"
 }
 
 ###

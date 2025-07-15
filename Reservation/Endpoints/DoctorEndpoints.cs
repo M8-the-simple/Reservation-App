@@ -1,35 +1,52 @@
+using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using Reservation.Dtos;
 using Reservation.Entities;
+using Reservation.Mapping;
 
 namespace Reservation.Endpoints;
 
 public static class DoctorEndpoints
 {
-    const string GetPatientEndpointName = "DoctorGetGame";
+    const string GetPatientEndpointName = "DoctorGetReservation";
     public static void MapDoctorEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("doctor");
-        
-        group.MapGet("/", (ReservationAppContext dbContext) => dbContext.Doctors);
 
-        // app.MapGet("/{id}", (int id) =>
-        // {
-        //     PatientDto? patient = patientDtos.Find(p => p.Id == id);
+        group.MapGet("/{id}", (int id, ReservationAppContext dbContext) =>
+        {
+            var doctor = dbContext.Doctors.Find(id);
+            if (doctor is null) return Results.NotFound();
+            return Results.Ok(dbContext.Reservations
+                     .Where(r => r.DoctorId == id)
+                     .Include(r => r.Patient)
+                     .Include(r => r.Doctor)
+                     .Select(r => r.ToReservationSummaryDto())
+                     .ToList());
+        });
+        group.MapPut("/reservation/{id}", (int id, ReservationAppContext dbContext, DoctorUpdateReservation update) =>
+        {
+            var reservation = dbContext.Reservations.Where(r => r.PatientId == update.PatientId).FirstOrDefault(d => d.Id == id);
+            if (reservation is null) return Results.NotFound("Reservation or patient");
 
-        //     return patient is null ?
-        //     Results.NotFound() : Results.Ok($"Patient Id: {patient.Id}");
+            dbContext.Entry(reservation)
+                     .CurrentValues
+                     .SetValues(update.ToEntity(id, reservation.DoctorId));
+            dbContext.SaveChanges();
 
-        // }).WithName(GetPatientEndpointName);
+            return Results.NoContent();
+        });
+        group.MapDelete("/{docId}/{resId}", (int docId, int resId, ReservationAppContext dbContext) =>
+        {
+            var reservation = dbContext.Reservations.Where(r => r.DoctorId == docId).FirstOrDefault(r => r.Id == resId);
+            if (reservation is null) return Results.NotFound();
 
-        // app.MapPut("/{id}", (PatientDto patient, int id) =>
-        // {
-        //     if (patientDtos.Find(p => p.Id == id) is null)
-        //     {
-        //         return Results.NotFound();
-        //     }
-            
-        //     patientDtos[id - 1] = patient;
-        //     return Results.NoContent();
-        // });
+            dbContext.Reservations.Remove(reservation!);
+            dbContext.SaveChanges();
+            return Results.NoContent();
+
+        });
     }
+    
 
 }

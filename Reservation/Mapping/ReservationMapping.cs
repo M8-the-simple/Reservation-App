@@ -15,14 +15,24 @@ public static class ReservationMapping
             Date = reservation.ReservationDate
         };
     }
-    public static ReservationEntity ToEntity(this UpdatedReservationDto reservation, int id)
+    public static ReservationEntity ToEntity(this UpdatedReservationDto reservation, int id, int patientId)
+    {
+        return new ReservationEntity()
+        {
+            Id = id,
+            PatientId = patientId,
+            DoctorId = reservation.DoctorId,
+            Date = reservation.ReservationDate
+        };
+    }
+    public static ReservationEntity ToEntity(this DoctorUpdateReservation reservation, int id, int doctorId)
     {
         return new ReservationEntity()
         {
             Id = id,
             PatientId = reservation.PatientId,
-            DoctorId = reservation.DoctorId,
-            Date = reservation.ReservationDate
+            DoctorId = doctorId,
+            Date = reservation.NewDate
         };
     }
     public static ReservationDetailsDto ToReservationDetailsDto(this ReservationEntity entity)

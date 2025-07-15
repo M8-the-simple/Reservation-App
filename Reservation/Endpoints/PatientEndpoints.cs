@@ -3,14 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Reservation.Dtos;
 using Reservation.Entities;
 using Reservation.Mapping;
-using Reservation.Utilities;
 
 namespace Reservation.Endpoints;
 
 public static class PatientEndpoints
 {
+    
     public static void MapPatientEndpoints(this WebApplication app)
     {
+        string GetReservationEndpointName = "GetReservation";
         var group = app.MapGroup("patient");
 
         group.MapPost("/", (ReservationDetailsDto reservation, ReservationAppContext dbContext) =>
@@ -26,7 +27,7 @@ public static class PatientEndpoints
 
             dbContext.SaveChanges();
 
-            return Results.Ok(reservationEntity);
+            return Results.CreatedAtRoute(GetReservationEndpointName, new {Id = reservationEntity.Id}, reservationEntity.ToReservationDetailsDto());
         });
 
         group.MapGet("/{id}", (ReservationAppContext dbContext, int id) =>
@@ -39,24 +40,17 @@ public static class PatientEndpoints
         group.MapGet("/reservation/{Id}", (ReservationAppContext dbContext, int id) =>
         {
             var reservation = dbContext.Reservations.FirstOrDefault(r => r.Id == id);
-            return reservation is null ? Results.NotFound() : Results.Ok(reservation.ToReservationDetailsDto());   
-        });
+            return reservation is null ? Results.NotFound() : Results.Ok(reservation.ToReservationDetailsDto());
+        }).WithName(GetReservationEndpointName);
 
-        group.MapPut("/reservation/{resid}", (int resid, ReservationAppContext dbContext, UpdatedReservationDto update) =>
+        group.MapPut("/reservation/{resId}", (int resId, ReservationAppContext dbContext, UpdatedReservationDto update) =>
         {
-            var patient = dbContext.Patients.Find(update.PatientId);
-            var doctor = dbContext.Doctors.Find(update.DoctorId);
+            var existingReservation = dbContext.Reservations.Where(r => r.Id == resId).FirstOrDefault(r => r.DoctorId == update.DoctorId);
 
-            if (patient is null || doctor is null) return Results.NotFound("Patient or doctor");
-
-            var existingReservation = dbContext.Reservations
-                                               .Where(r => r.PatientId == update.PatientId)
-                                               .FirstOrDefault(r => r.Id == resid);
-
-            if (existingReservation is null) return Results.NotFound("Reservation");
+            if (existingReservation is null) return Results.NotFound("Reservation or Doctor");
 
             dbContext.Entry(existingReservation)
-                     .CurrentValues.SetValues(update.ToEntity(resid));
+                     .CurrentValues.SetValues(update.ToEntity(resId, existingReservation.PatientId));
 
             dbContext.SaveChanges();
 

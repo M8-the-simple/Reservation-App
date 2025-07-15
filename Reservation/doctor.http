@@ -1,17 +1,15 @@
-GET http://localhost:5245/doctor/
+GET http://localhost:5245/doctor/1
 
 ###
 
-GET http://localhost:5245/1
-
-###
-
-PUT http://localhost:5245/3
+PUT http://localhost:5245/doctor/reservation/1
 Content-Type: application/json
 
-{
-    "firstName": "Matijas",
-    "lastName": "Milosic",
-    "doctor": "Mike",
-    "reservationDate": "2025-07-07T16:45:00"
+{ 
+  "patientId" : 2,  
+  "newDate" : "2024-06-30T18:30:00"
 }
+
+###
+
+DELETE http://localhost:5245/doctor/1/7
