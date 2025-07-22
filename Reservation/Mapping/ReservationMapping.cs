@@ -6,11 +6,11 @@ namespace Reservation.Mapping;
 
 public static class ReservationMapping
 {
-    public static ReservationEntity ToEntity(this ReservationDetailsDto reservation)
+    public static ReservationEntity ToEntity(this ReservationDetailsDto reservation, int patientId)
     {
         return new ReservationEntity()
         {
-            PatientId = reservation.PatientId,
+            PatientId = patientId,
             DoctorId = reservation.DoctorId,
             Date = reservation.ReservationDate
         };
