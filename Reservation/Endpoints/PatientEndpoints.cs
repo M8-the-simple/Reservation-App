@@ -74,7 +74,7 @@ public static class PatientEndpoints
             if (doctor is null) return Results.NotFound("Doctor doesn't exist");
 
 
-            if (user.FindFirstValue("role") != "admin")
+            if (!user.IsInRole("admin"))
             {
                 var hasClaim = user.HasClaim(claim => claim.Type == "id");
                 if (hasClaim)
