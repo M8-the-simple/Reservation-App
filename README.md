@@ -1,4 +1,5 @@
 Treba se unutar .NET cli-a navigirati do .\Reservation\ te pokrenuti aplikaciju.
+Korištena baza podataka je SQLite. Preporuča se korištenje Visual Studio Code-a sa extensionima: REST Client, SQLite, te C# dev kit.
 
 Stvaranje konktrenih rezervacija se dešava unutar .http datoteka. U tim datotekama se nalaze već spremni JWT tokeni unutar kojih se nalaze potrebne uloge za moći pristupiti 'endpointovima', te 'claim', 'id'.
 Za dohvaćanje rezeravacija, ali i za njihovo stvaranje se koristi kombinacija URL-a i 'id' 'claim' u JWT tokenu.
